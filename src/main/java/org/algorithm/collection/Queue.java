@@ -54,15 +54,17 @@ public class Queue<E> implements Iterable<E> {
             @Override
             @SuppressWarnings("unchecked")
             public E next() {
-                if (current > realCount)
-                    throw new ArrayIndexOutOfBoundsException("索引超过数组的边界");
-                return (E) array[current++];
+                if (hasNext())
+                    return (E) array[current++];
+                else
+                    return null;
             }
 
             @Override
             public void remove() {
-                if (current > realCount)
-                    throw new ArrayIndexOutOfBoundsException("索引超过数组的边界");
+                if (!hasNext())
+                    return;
+
                 array[current] = null;
                 for (int i = current + 1; i < realCount; i++) {
                     array[i - 1] = array[i];

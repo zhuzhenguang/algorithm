@@ -12,36 +12,9 @@ import java.util.Iterator;
 public class Queue<E> implements Iterable<E> {
     private Object[] array;
     private int realCount;
-    private Iterator<E> it;
 
     public Queue(int size) {
         this.array = new Object[size];
-        it = new Iterator<E>() {
-            private int current;
-
-            @Override
-            public boolean hasNext() {
-                return current < realCount && array[current] != null;
-            }
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public E next() {
-                checkRange();
-                return (E) array[current++];
-            }
-
-            @Override
-            public void remove() {
-                checkRange();
-                array[current] = null;
-                for (int i = current + 1; i < realCount; i++) {
-                    array[i - 1] = array[i];
-                    array[i] = null;
-                }
-                realCount--;
-            }
-        };
     }
 
     public void enqueue(E element) {
@@ -70,6 +43,60 @@ public class Queue<E> implements Iterable<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return it;
+        return new Iterator<E>() {
+            private int current;
+
+            @Override
+            public boolean hasNext() {
+                return current < realCount;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public E next() {
+                if (current > realCount)
+                    throw new ArrayIndexOutOfBoundsException("索引超过数组的边界");
+                return (E) array[current++];
+            }
+
+            @Override
+            public void remove() {
+                if (current > realCount)
+                    throw new ArrayIndexOutOfBoundsException("索引超过数组的边界");
+                array[current] = null;
+                for (int i = current + 1; i < realCount; i++) {
+                    array[i - 1] = array[i];
+                    array[i] = null;
+                }
+                realCount--;
+            }
+        };
+    }
+
+    public static void main(String[] args) {
+        Queue<String> queue = new Queue<String>(3);
+        queue.enqueue("zhu");
+        queue.enqueue("zhen");
+        queue.enqueue("guang");
+
+        for (String q : queue) {
+            System.out.println(q);
+        }
+
+        System.out.println(queue.size());
+
+        queue.dequeue(1);
+
+        for (String s : queue) {
+            System.out.println(s);
+        }
+        System.out.println(queue.size());
+
+        Iterator iterator = queue.iterator();
+        while (iterator.hasNext()) {
+            iterator.remove();
+        }
+
+        System.out.println(queue.size());
     }
 }
